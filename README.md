@@ -1,4 +1,4 @@
-This is a desktop chat that uses the Ollama LLM models. Easier to chat to than in the command line.
+This is a desktop chat that uses the Ollama LLM models. User Friendly way to chat to your models using this than the CLI.
 
 This is my first windows application (WPF Framework) so just wanted to try making something simple.
 
