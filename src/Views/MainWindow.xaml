@@ -1,0 +1,626 @@
+<Window x:Class="OllamaDesktopChat.src.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:resources="clr-namespace:OllamaDesktopChat.src.Resources"
+    x:Name="RootWindow"
+        mc:Ignorable="d"
+        Title="Ollama Desktop Chat"
+        Height="760"
+        Width="1200"
+        MinWidth="900"
+        MinHeight="620"
+        WindowStartupLocation="CenterScreen"
+        Icon="/src/Resources/AppIcon.ico"
+        Background="#1a1a1a">
+    <Window.Resources>
+        <resources:RoleToHorizontalAlignmentConverter x:Key="RoleToHorizontalAlignmentConverter" />
+        <resources:RoleToBubbleBrushConverter x:Key="RoleToBubbleBrushConverter" />
+        <resources:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <resources:AssistantMarkdownToUiConverter x:Key="AssistantMarkdownToUiConverter" />
+
+        <DataTemplate x:Key="UserMessageTemplate">
+            <Border Padding="12"
+                    CornerRadius="14"
+                    Background="#0ea5e9"
+                    BorderBrush="#0b88c0"
+                    BorderThickness="1">
+                <TextBlock Text="{Binding Content}"
+                           FontSize="14"
+                           Foreground="#ffffff"
+                           TextWrapping="Wrap" />
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="AssistantMessageTemplate">
+            <ContentControl Content="{Binding Content, Converter={StaticResource AssistantMarkdownToUiConverter}}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="SystemMessageTemplate">
+            <Border Padding="10"
+                    CornerRadius="10"
+                    Background="#3a3a3a"
+                    BorderBrush="#4a4a4a"
+                    BorderThickness="1">
+                <TextBlock Text="{Binding Content}"
+                           FontSize="13"
+                           Foreground="#ffffff"
+                           TextWrapping="Wrap" />
+            </Border>
+        </DataTemplate>
+
+        <Style x:Key="RoundedSendButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#0ea5e9" />
+            <Setter Property="Foreground" Value="#ffffff" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SidebarGhostButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="#ffffff" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#2a2a2a" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#323232" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ConversationListItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Focusable" Value="True" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="ItemBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="Transparent"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Margin="4,2">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#2a2a2a" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#2a2a2a" />
+                                <Setter TargetName="ItemBorder" Property="BorderBrush" Value="#3a3a3a" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ConversationOptionsButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="24" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="#cfcfcf" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="DotsBorder"
+                                Background="Transparent"
+                                CornerRadius="6">
+                            <TextBlock Text="&#xE712;"
+                                       FontFamily="Segoe Fluent Icons"
+                                       FontSize="14"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="DotsBorder" Property="Background" Value="#3a3a3a" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ConversationOptionsMenuStyle" TargetType="ContextMenu">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Background" Value="#2a2a2a" />
+            <Setter Property="BorderBrush" Value="#3a3a3a" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="6" />
+            <Setter Property="Foreground" Value="#f2f2f2" />
+            <Setter Property="HasDropShadow" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ContextMenu">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10"
+                                Padding="{TemplateBinding Padding}">
+                            <StackPanel IsItemsHost="True"
+                                        KeyboardNavigation.DirectionalNavigation="Cycle" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ConversationMenuItemStyle" TargetType="MenuItem">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Foreground" Value="#f2f2f2" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="10,8" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="MenuItem">
+                        <Border x:Name="MenuItemBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter ContentSource="Header"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="MenuItemBorder" Property="Background" Value="#3a3a3a" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ChatListItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="ItemBorder" Background="Transparent" BorderBrush="Transparent" BorderThickness="0">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="Transparent" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="InputIconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="34" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="17">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#34363a" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="#2a2c30" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0"
+                Background="#1a1a1a"
+                BorderBrush="#3a3a3a"
+                BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Vertical">
+                <!-- Model Selector Section -->
+                <StackPanel Margin="16" Orientation="Vertical">
+                    <TextBlock Text="Model"
+                               Foreground="#888888"
+                               FontSize="11"
+                               Margin="0,0,0,8"
+                               FontWeight="Bold" />
+                    <Border Background="#2a2a2a"
+                            BorderBrush="#0ea5e9"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                        <ComboBox ItemsSource="{Binding Models}"
+                                  SelectedItem="{Binding SelectedModel}"
+                                  DisplayMemberPath="Name"
+                                  VerticalContentAlignment="Center"
+                                  MinHeight="36"
+                                  Padding="8,2"
+                                  Background="Transparent"
+                                  Foreground="#000000"
+                                  BorderThickness="0" />
+                    </Border>
+                </StackPanel>
+
+                <!-- New Chat Button -->
+                <Button Command="{Binding NewConversationCommand}"
+                        Margin="16,0,16,16"
+                        MinHeight="36"
+                        Padding="10,8"
+                        Style="{StaticResource SidebarGhostButtonStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE70F;"
+                                   FontFamily="Segoe Fluent Icons"
+                                   FontSize="13"
+                                   VerticalAlignment="Center"
+                                   Foreground="#ffffff" />
+                        <TextBlock Text="New chat"
+                                   Margin="10,0,0,0"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Foreground="#ffffff" />
+                    </StackPanel>
+                </Button>
+
+                <!-- Search Box -->
+                <StackPanel Margin="16,0,16,16" Orientation="Vertical">
+                    <Border Background="#2a2a2a"
+                            BorderBrush="#3a3a3a"
+                            BorderThickness="1"
+                            CornerRadius="8">
+                        <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                                 Background="Transparent"
+                                 Foreground="#ffffff"
+                                 BorderThickness="0"
+                                 Padding="10,8"
+                                 MinHeight="36" />
+                    </Border>
+                </StackPanel>
+
+                <!-- Conversations List -->
+                <TextBlock Text="Conversations"
+                           Foreground="#888888"
+                           FontSize="11"
+                           Margin="16,0,16,8"
+                           FontWeight="Bold" />
+
+                <ListBox x:Name="ConversationsListBox"
+                         ItemsSource="{Binding Conversations}"
+                         SelectedValuePath="ConversationId"
+                         SelectionChanged="ConversationsListBox_SelectionChanged"
+                         Background="Transparent"
+                         BorderThickness="0"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                         Margin="0">
+
+                    <ListBox.ItemContainerStyle>
+                        <StaticResource ResourceKey="ConversationListItemStyle" />
+                    </ListBox.ItemContainerStyle>
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="12,10" Cursor="Hand">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Conversation Title -->
+                                <TextBlock x:Name="ConversationTitleText"
+                                           Grid.Row="0"
+                                           Grid.Column="0"
+                                           Text="{Binding Title}"
+                                           Foreground="#ffffff"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           TextTrimming="CharacterEllipsis" />
+
+                                <TextBox x:Name="ConversationRenameTextBox"
+                                         Grid.Row="0"
+                                         Grid.Column="0"
+                                         Text="{Binding EditableTitle, UpdateSourceTrigger=PropertyChanged}"
+                                         Visibility="Collapsed"
+                                         Foreground="#ffffff"
+                                         Background="#1f1f1f"
+                                         BorderBrush="#4a4a4a"
+                                         BorderThickness="1"
+                                         Padding="6,2"
+                                         FontSize="13"
+                                         IsVisibleChanged="ConversationRenameTextBox_IsVisibleChanged"
+                                         KeyDown="ConversationRenameTextBox_KeyDown"
+                                         LostKeyboardFocus="ConversationRenameTextBox_LostKeyboardFocus" />
+
+                                <!-- Timestamp -->
+                                <TextBlock Grid.Row="1"
+                                           Grid.Column="0"
+                                           Text="{Binding LastModified, StringFormat={}{0:MMM d, HH:mm}}"
+                                           Foreground="#666666"
+                                           FontSize="11"
+                                           Margin="0,4,0,0" />
+
+                                <Button x:Name="ConversationOptionsButton"
+                                        Grid.Row="0"
+                                        Grid.RowSpan="2"
+                                        Grid.Column="1"
+                                        Margin="8,0,0,0"
+                                        Style="{StaticResource ConversationOptionsButtonStyle}"
+                                        Click="ConversationOptionsButton_Click">
+                                    <Button.ContextMenu>
+                                        <ContextMenu Style="{StaticResource ConversationOptionsMenuStyle}">
+                                            <MenuItem
+                                                      Style="{StaticResource ConversationMenuItemStyle}"
+                                                      Command="{Binding DataContext.RenameConversationCommand, Source={x:Reference RootWindow}}"
+                                                      CommandParameter="{Binding ConversationId}">
+                                                <MenuItem.Header>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="&#xE70F;"
+                                                                   FontFamily="Segoe Fluent Icons"
+                                                                   FontSize="14"
+                                                                   Foreground="#f2f2f2"
+                                                                   VerticalAlignment="Center" />
+                                                        <TextBlock Text="Rename"
+                                                                   Margin="10,0,0,0"
+                                                                   Foreground="#f2f2f2"
+                                                                   VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </MenuItem.Header>
+                                            </MenuItem>
+                                            <MenuItem
+                                                      Style="{StaticResource ConversationMenuItemStyle}"
+                                                      Foreground="#ef4444"
+                                                      Command="{Binding DataContext.DeleteConversationCommand, Source={x:Reference RootWindow}}"
+                                                      CommandParameter="{Binding ConversationId}">
+                                                <MenuItem.Header>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="&#xE74D;"
+                                                                   FontFamily="Segoe Fluent Icons"
+                                                                   FontSize="14"
+                                                                   Foreground="#ef4444"
+                                                                   VerticalAlignment="Center" />
+                                                        <TextBlock Text="Delete"
+                                                                   Margin="10,0,0,0"
+                                                                   Foreground="#ef4444"
+                                                                   VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                </MenuItem.Header>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                </Button>
+                            </Grid>
+
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True">
+                                    <Setter TargetName="ConversationOptionsButton" Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                    <Setter TargetName="ConversationOptionsButton" Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsRenaming}" Value="True">
+                                    <Setter TargetName="ConversationTitleText" Property="Visibility" Value="Collapsed" />
+                                    <Setter TargetName="ConversationRenameTextBox" Property="Visibility" Value="Visible" />
+                                    <Setter TargetName="ConversationOptionsButton" Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                </StackPanel>
+
+                <!-- Settings Button at Bottom -->
+                <Border Grid.Row="1"
+                        Background="#242424"
+                        BorderBrush="#3a3a3a"
+                        BorderThickness="0,1,0,0"
+                        Padding="12">
+                    <Button x:Name="SettingsButton"
+                            Width="40"
+                            Height="40"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Click="SettingsButton_Click"
+                            ToolTip="Settings">
+                        <TextBlock Text="⚙"
+                                   FontSize="20"
+                                   Foreground="#888888"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                    </Button>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Main Area -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <!-- Chat Messages Area -->
+            <Border Grid.Row="0"
+                    Margin="16"
+                    Background="#2a2a2a"
+                    BorderBrush="#3a3a3a"
+                    BorderThickness="1"
+                    CornerRadius="10">
+                <ListBox x:Name="ChatListBox"
+                         ItemsSource="{Binding Messages}"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                <ListBox.ItemContainerStyle>
+                    <StaticResource ResourceKey="ChatListItemStyle" />
+                </ListBox.ItemContainerStyle>
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="8">
+                            <StackPanel HorizontalAlignment="{Binding Role, Converter={StaticResource RoleToHorizontalAlignmentConverter}}"
+                                        MaxWidth="640">
+                                <TextBlock Margin="4,0,4,3"
+                                           Foreground="#666666"
+                                           FontSize="11"
+                                           Text="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}" />
+
+                                <ContentControl x:Name="MessageContent"
+                                                Content="{Binding}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Role}" Value="user">
+                                <Setter TargetName="MessageContent" Property="ContentTemplate" Value="{StaticResource UserMessageTemplate}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Role}" Value="assistant">
+                                <Setter TargetName="MessageContent" Property="ContentTemplate" Value="{StaticResource AssistantMessageTemplate}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Role}" Value="system">
+                                <Setter TargetName="MessageContent" Property="ContentTemplate" Value="{StaticResource SystemMessageTemplate}" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+
+        <StackPanel Grid.Row="1"
+                    Margin="16,0,16,16"
+                    Orientation="Vertical">
+            <Border Padding="10,8"
+                    Background="#24262b"
+                    BorderBrush="#3a3d45"
+                    BorderThickness="1"
+                    CornerRadius="22">
+                <Border.Effect>
+                    <DropShadowEffect Color="#66000000" BlurRadius="10" ShadowDepth="0" Opacity="0.65" />
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                            Margin="0,0,8,0"
+                            Style="{StaticResource InputIconButtonStyle}"
+                            Click="UploadButton_Click"
+                            ToolTip="Add file">
+                        <TextBlock Text="+"
+                                   FontSize="24"
+                                   Foreground="#d5d7db"
+                                   FontWeight="Light"
+                                   Margin="0,-2,0,0" />
+                    </Button>
+
+                    <TextBox x:Name="MessageInputTextBox"
+                             Grid.Column="1"
+                             MinHeight="34"
+                             MaxHeight="180"
+                             VerticalContentAlignment="Center"
+                             VerticalScrollBarVisibility="Auto"
+                             TextWrapping="Wrap"
+                             AcceptsReturn="True"
+                             PreviewKeyDown="MessageInputTextBox_PreviewKeyDown"
+                             Text="{Binding UserInput, UpdateSourceTrigger=PropertyChanged}"
+                             Background="Transparent"
+                             Foreground="#ffffff"
+                             BorderThickness="0"
+                             FontSize="16"
+                             Padding="4,4"
+                             CaretBrush="#ffffff" />
+
+                    <Button Grid.Column="2"
+                            Margin="8,0,0,0"
+                            Style="{StaticResource InputIconButtonStyle}"
+                            IsEnabled="{Binding IsGenerating, Converter={StaticResource InverseBooleanConverter}}"
+                            Command="{Binding SendMessageCommand}"
+                            ToolTip="Send message">
+                        <Border Width="32" Height="32" CornerRadius="16" Background="#f1f3f5">
+                            <TextBlock Text="↑"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="#1c1d20"
+                                       FontSize="17"
+                                       FontWeight="Bold"
+                                       Margin="0,-1,0,0" />
+                        </Border>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <TextBlock Margin="8,6,0,0"
+                       Foreground="#666666"
+                       FontSize="12"
+                       Text="{Binding StatusMessage}" />
+        </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

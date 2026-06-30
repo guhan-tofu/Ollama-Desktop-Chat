@@ -1,0 +1,72 @@
+<Window x:Class="OllamaDesktopChat.Views.SetupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ollama Desktop Chat - Setup" 
+        Height="300" 
+        Width="500"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#F5F5F5"
+        ShowInTaskbar="False">
+    <Grid Margin="30">
+        <StackPanel VerticalAlignment="Center">
+            <!-- Title -->
+            <TextBlock Text="Welcome to Ollama Desktop Chat" 
+                       FontSize="24" 
+                       FontWeight="Bold" 
+                       Foreground="#333333"
+                       Margin="0,0,0,10"/>
+            
+            <!-- Description -->
+            <TextBlock Text="Let&apos;s configure your Ollama connection" 
+                       FontSize="14" 
+                       Foreground="#666666" 
+                       TextWrapping="Wrap"
+                       Margin="0,0,0,20"/>
+            
+            <!-- Ollama Endpoint -->
+            <StackPanel Margin="0,0,0,20">
+                <TextBlock Text="Ollama Server Endpoint:" 
+                           FontWeight="SemiBold" 
+                           Foreground="#333333"
+                           Margin="0,0,0,5"/>
+                <TextBox x:Name="EndpointTextBox" 
+                         Height="35" 
+                         Padding="10,8"
+                         FontSize="12"
+                         Text="http://localhost:11434"
+                         Background="White"
+                         BorderBrush="#CCCCCC"
+                         BorderThickness="1"
+                         Margin="0,0,0,5"/>
+                <TextBlock Text="e.g., http://localhost:11434 or http://192.168.1.100:11434" 
+                           FontSize="11" 
+                           Foreground="#999999"/>
+            </StackPanel>
+
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Right" 
+                        Margin="0,20,0,0">
+                <Button x:Name="CancelButton" 
+                        Content="Cancel" 
+                        Width="100" 
+                        Height="36"
+                        Background="#F0F0F0"
+                        Foreground="#333333"
+                        BorderBrush="#CCCCCC"
+                        BorderThickness="1"
+                        Margin="0,0,10,0"
+                        Click="CancelButton_Click"/>
+                <Button x:Name="SaveButton" 
+                        Content="Save &amp; Continue" 
+                        Width="140" 
+                        Height="36"
+                        Background="#0078D4"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Click="SaveButton_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

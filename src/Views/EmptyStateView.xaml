@@ -1,0 +1,124 @@
+<UserControl x:Class="OllamaDesktopChat.src.Views.EmptyStateView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             Background="Transparent">
+    <Grid>
+        <StackPanel VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    TextBlock.TextAlignment="Center"
+                    MaxWidth="600">
+            <!-- Main heading -->
+            <TextBlock Text="What can I help with?"
+                       Foreground="#ffffff"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       Margin="0,0,0,12" />
+
+            <!-- Subtitle -->
+            <TextBlock Text="Ask me anything or start a new conversation"
+                       Foreground="#888888"
+                       FontSize="16"
+                       Margin="0,0,0,32"
+                       TextWrapping="Wrap" />
+
+            <!-- Quick action buttons (2x2 grid) -->
+            <Grid Margin="0,0,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="12" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Top-left button: Examples -->
+                <Button Grid.Row="0"
+                        Grid.Column="0"
+                        Content="💡 Examples"
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Foreground="#ffffff"
+                        Background="#2a2a2a"
+                        BorderBrush="#3a3a3a"
+                        BorderThickness="1"
+                        Padding="16,12"
+                        Cursor="Hand"
+                        x:Name="ExamplesButton" />
+
+                <!-- Top-right button: Clear Chat -->
+                <Button Grid.Row="0"
+                        Grid.Column="2"
+                        Content="🗑️ Clear Chat"
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Foreground="#ffffff"
+                        Background="#2a2a2a"
+                        BorderBrush="#3a3a3a"
+                        BorderThickness="1"
+                        Padding="16,12"
+                        Cursor="Hand"
+                        x:Name="ClearChatButton" />
+
+                <!-- Bottom-left button: Refresh Models -->
+                <Button Grid.Row="2"
+                        Grid.Column="0"
+                        Content="🔄 Refresh Models"
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Foreground="#ffffff"
+                        Background="#2a2a2a"
+                        BorderBrush="#3a3a3a"
+                        BorderThickness="1"
+                        Padding="16,12"
+                        Cursor="Hand"
+                        x:Name="RefreshModelsButton" />
+
+                <!-- Bottom-right button: Upload File -->
+                <Button Grid.Row="2"
+                        Grid.Column="2"
+                        Content="📎 Upload File"
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Foreground="#ffffff"
+                        Background="#2a2a2a"
+                        BorderBrush="#3a3a3a"
+                        BorderThickness="1"
+                        Padding="16,12"
+                        Cursor="Hand"
+                        x:Name="UploadFileButton" />
+            </Grid>
+
+            <!-- Capabilities list -->
+            <TextBlock Text="Capabilities:"
+                       Foreground="#cccccc"
+                       FontSize="12"
+                       FontWeight="Bold"
+                       Margin="0,0,0,8" />
+
+            <ItemsControl>
+                <TextBlock Text="• Generate creative content and ideas"
+                           Foreground="#999999"
+                           FontSize="12"
+                           Margin="0,0,0,4" />
+                <TextBlock Text="• Answer questions about any topic"
+                           Foreground="#999999"
+                           FontSize="12"
+                           Margin="0,0,0,4" />
+                <TextBlock Text="• Help with coding and analysis"
+                           Foreground="#999999"
+                           FontSize="12"
+                           Margin="0,0,0,4" />
+                <TextBlock Text="• Summarize and explain complex topics"
+                           Foreground="#999999"
+                           FontSize="12"
+                           Margin="0,0,0,4" />
+            </ItemsControl>
+        </StackPanel>
+    </Grid>
+</UserControl>
